@@ -170,7 +170,7 @@ for bt in range(3):
     axs.set_ylim([0, 150])
         
     axs.set_title('{} mm bolus'.format(boluses[bt]))
-    axs.legend(fontsize='xsmall', loc='upper right')
+    axs.legend(fontsize='x-small', loc='upper right')
     axs.set_xlabel('Depth')
     axs.set_ylabel('Percent Rx Dose')
     fig.savefig('{}PDD.png'.format(boluses[bt]))
