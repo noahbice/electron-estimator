@@ -168,7 +168,8 @@ for bt in range(4):
         axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
     axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
     axs.plot([t_max_input + boluses[bt], t_max_input + boluses[bt]], [0, 150], label='t_max + bolus', color=colors[-2])
-    axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
+    if boluses[bt] != 0:
+        axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
     axs.set_xlim([0, np.minimum(3 * t_max_input, data[e][-1, 0])])
     axs.set_ylim([0, 150])
         
