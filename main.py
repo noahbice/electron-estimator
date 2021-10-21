@@ -169,7 +169,7 @@ for bt in range(3):
     axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
     axs.plot([t_max_input + boluses[bt], t_max_input + boluses[bt]], [0, 150], label='t_max + bolus', color=colors[-2])
     axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
-    axs.set_xlim([0, data[e][-1, 0]])
+    axs.set_xlim([0, np.minimum(3 * t_max_input, data[e][-1, 0])])
     axs.set_ylim([0, 150])
         
     axs.set_title('{} mm bolus'.format(boluses[bt]))
