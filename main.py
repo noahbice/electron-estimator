@@ -117,22 +117,24 @@ def sunshine_logic(t_min, t_max, field_size):
 
     return recommended_energy, recommended_bolus
 
-def brute_force(t_min, t_max, field_size):
+def brute_force(t_min, t_max, field_size, w1=1., w2=1., w3=1., w4=1.):
     possibilities = []
     depth_dose = np.round(1.5 * t_max, 2)
     for energy_index in range(5):
         for bolus_thickness in [3, 5, 10]:
-            possibilities.append([energy_dictionary[energy_index], bolus_thickness] + print_out(t_min, t_max, field_size, energy_index, bolus_thickness, verbose=False))
+            po = print_out(t_min, t_max, field_size, energy_index, bolus_thickness, verbose=False)
+            error = (w1 * (100 - po[0]) ** 2) + (w2 * (100 - po[2]) **2) + (w3 * po[3] ** 2) + (w4 * (po[4]) ** 2)
+            possibilities.append([energy_dictionary[energy_index], bolus_thickness] + po + [error] )
     possibilities = pd.DataFrame(np.array(possibilities), columns=['Energy', 'Bolus', 'Target Entrance Dose',
                                                                    'Target Exit Dose', 'Hot Spot', 'Skin Dose',
-                                                                   'Depth Dose ({} mm)'.format(depth_dose)])
+                                                                   'Depth Dose ({} mm)'.format(depth_dose), 'Error'])
     possibilities['Skin Dose'] = possibilities['Skin Dose'].astype('float').round(2)
     possibilities['Target Exit Dose'] = possibilities['Target Exit Dose'].astype('float').round(2)
     possibilities['Target Entrance Dose'] = possibilities['Target Entrance Dose'].astype('float').round(2)
     possibilities['Hot Spot'] = possibilities['Hot Spot'].astype('float').round(2)
     possibilities['Depth Dose ({} mm)'.format(depth_dose)] = possibilities['Depth Dose ({} mm)'.format(depth_dose).format(np.round(1.5*t_max, 2))].astype('float').round(2)
 
-    possibilities = possibilities.sort_values(by=['Target Entrance Dose'], axis=0, ascending=True)
+    possibilities = possibilities.sort_values(by=['Score'], axis=0, ascending=True)
 
     return possibilities
 
