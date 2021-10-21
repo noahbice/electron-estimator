@@ -173,5 +173,6 @@ for bt in range(3):
     axs[bt].legend(fontsize='small', loc='upper right')
     axs[bt].set_xlabel('Depth')
     axs[bt].set_ylabel('Percent Rx Dose')
-st.pyplot(fig)
+fig.savefig('PDDs.png')
+st.image('PDDs.png')
 
