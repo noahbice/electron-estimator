@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+from matplotlib.colors import mcolors
 import pandas as pd
 import streamlit as st
 
@@ -151,6 +152,7 @@ output = brute_force(t_min_input, t_max_input, field_size_input)
 # st.dataframe(output, width=2000, height=1000)
 st.table(output)
 
+colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
 boluses = [3, 5, 10]
 for bt in range(3):
     fig, axs = plt.subplots()
@@ -164,10 +166,10 @@ for bt in range(3):
         Rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
         if np.amax(Rx_normed) > 150:
             continue
-        axs.plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]))
-    axs.plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 150], label='t_min + bolus')
-    axs.plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 150], label='t_max + bolus')
-    axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface')
+        axs.plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
+    axs.plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
+    axs.plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 150], label='t_max + bolus', color=colors[-2])
+    axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
     axs.set_xlim([0, data[e][-1, 0]])
     axs.set_ylim([0, 150])
         
