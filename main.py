@@ -194,6 +194,7 @@ st.dataframe(output, width=2000, height=1000)
 
 colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
 boluses = [0, 3, 5, 10]
+cols = st.columns(2)
 for bt in range(4):
     fig, axs = plt.subplots()
     for e in range(5):
@@ -220,4 +221,5 @@ for bt in range(4):
     axs.set_xlabel('Depth [mm]')
     axs.set_ylabel('Percent Rx Dose')
     fig.savefig('{}PDD.png'.format(boluses[bt]))
-    st.image('{}PDD.png'.format(boluses[bt]))
+    col_idx = bt % 2
+    cols[col_idx].image('{}PDD.png'.format(boluses[bt]))
