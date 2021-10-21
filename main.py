@@ -152,8 +152,6 @@ output = brute_force(t_min_input, t_max_input, field_size_input)
 st.table(output)
 
 fig, axs = plt.subplots(1, 3)
-fig.set_figheight(1)
-fig.set_figwidth=(1)
 boluses = [3, 5, 10]
 for bt in range(3):
     for e in range(5):
@@ -173,7 +171,7 @@ for bt in range(3):
         
     axs[bt].set_title('{} mm bolus'.format(boluses[bt]))
     axs[bt].legend(fontsize='small', loc='upper right')
-    axs[bt].set_xlabel('Depth', fontsize=14)
-    axs[bt].set_ylabel('Percent Rx Dose', fontsize=14)
+    axs[bt].set_xlabel('Depth')
+    axs[bt].set_ylabel('Percent Rx Dose')
 st.pyplot(fig)
 
