@@ -162,7 +162,7 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
         'Depth Dose ({} mm)'.format(depth_dose)].astype('float').round(2)
 
     possibilities = possibilities.sort_values(by=['Error'], axis=0, ascending=True)
-    # possibilities = possibilities.drop(columns=['Error'])
+    possibilities = possibilities.drop(columns=['Error'])
 
     return possibilities
 
