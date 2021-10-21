@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-from matplotlib.colors import mcolors
 import pandas as pd
 import streamlit as st
 
