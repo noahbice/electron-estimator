@@ -163,7 +163,7 @@ for bt in range(3):
         t_max_dose = fine_res_dose[t_max_idx]
         
         rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
-        if np.amax(Rx_normed) > 150:
+        if np.amax(rx_normed) > 150:
             continue
         axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
     axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
