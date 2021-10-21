@@ -129,8 +129,16 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
             skin_err = w_skin * (max(90, po[3]) - 90)
             depth_err = w_depth * (max(oar_target_dose, po[4]) - oar_target_dose)
             hotspot_error = w_hotspot * (po[2] - 100)
-            w_t_min_error = w_t_min * np.abs(100 - po[0])
-            error = w_t_min_error + hotspot_error + skin_err + depth_err
+            t_min_error = w_t_min * np.abs(100 - po[0])
+
+            # print(energy_dictionary[energy_index], bolus_thickness)
+            # print('skin', skin_err)
+            # print('depth', depth_err)
+            # print('t_min', t_min_error)
+            # print('hot_spot', hotspot_error)
+
+
+            error = t_min_error + hotspot_error + skin_err + depth_err
 
             cont = False
             for value in po:
@@ -149,28 +157,28 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
     possibilities['Target Exit Dose'] = possibilities['Target Exit Dose'].astype('float').round(2)
     possibilities['Target Entrance Dose'] = possibilities['Target Entrance Dose'].astype('float').round(2)
     possibilities['Hot Spot'] = possibilities['Hot Spot'].astype('float').round(2)
+    possibilities['Error'] = possibilities['Error'].astype('float')
     possibilities['Depth Dose ({} mm)'.format(depth_dose)] = possibilities[
         'Depth Dose ({} mm)'.format(depth_dose)].astype('float').round(2)
 
     possibilities = possibilities.sort_values(by=['Error'], axis=0, ascending=True)
-    possibilities = possibilities.drop(columns=['Error'])
+    # possibilities = possibilities.drop(columns=['Error'])
 
     return possibilities
 
 
-
 st.set_page_config(layout='wide')
 st.title('Electron Energy/Bolus Estimator')
-t_min_input = st.number_input('Target Min Depth [mm]', value=10., step=0.1)
-t_max_input = st.number_input('Target Max Depth [mm]', value=20., step=0.1)
+t_min_input = st.number_input('Target Min Depth [mm]', value=10., step=0.5)
+t_max_input = st.number_input('Target Max Depth [mm]', value=20., step=0.5)
 field_size_input = st.selectbox('Field Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'), index=3)
 if t_max_input < t_min_input:
     st.error('Target min depth should be < target max depth.')
     quit()
 
 with st.expander("Advanced"):
-    oar_depth_input = st.number_input('OAR Depth [mm]', value=1.5 * t_max_input, step=0.1)
-    oar_target_dose_input = st.number_input('OAR Target Dose [%Rx Dose]', value=30., step=0.1)
+    oar_depth_input = st.number_input('OAR Depth [mm]', value=1.5 * t_max_input, step=0.5)
+    oar_target_dose_input = st.number_input('OAR Target Dose [%Rx Dose]', value=30., step=1.)
     w_t_input = st.number_input('Entrance Dose Coverage Priority', value=1., step=0.1)
     w_hotspot_input = st.number_input('Hotspot Reduction Priority', value=1., step=0.1)
     w_skin_input = st.number_input('Skin Dose Reduction Priority', value=1., step=0.1)
