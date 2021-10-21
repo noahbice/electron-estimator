@@ -167,10 +167,10 @@ for bt in range(3):
     axs[bt].plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 100], label='t_max + bolus')
     axs[bt].plot([boluses[bt], boluses[bt]], [0, 100], label='skin surface')
     axs[bt].set_xlim([0, data[e][-1, 0]])
-    axs[bt].set_ylim([0, np.amax(Rx_normed) + 0.05])
+    axs[bt].set_ylim([0, 150])
         
     axs[bt].set_title('{} mm bolus'.format(boluses[bt]))
-    axs[bt].legend(fontsize='small', loc='upper right')
+    axs[bt].legend(fontsize='xsmall', loc='upper right')
     axs[bt].set_xlabel('Depth')
     axs[bt].set_ylabel('Percent Rx Dose')
 fig.savefig('PDDs.png')
