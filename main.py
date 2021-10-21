@@ -162,10 +162,10 @@ for bt in range(3):
         t_max_idx = np.where(np.abs(fine_res_depths - (t_max + boluses[bt])) == np.amin(np.abs(fine_res_depths - (t_max + boluses[bt]))))[0][0]
         t_max_dose = fine_res_dose[t_max_idx]
         
-        Rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
+        rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
         if np.amax(Rx_normed) > 150:
             continue
-        axs.plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
+        axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
     axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
     axs.plot([t_max_input + boluses[bt], t_max_input + boluses[bt]], [0, 150], label='t_max + bolus', color=colors[-2])
     axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
