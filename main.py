@@ -162,7 +162,7 @@ for bt in range(3):
         t_max_dose = fine_res_dose[t_max_idx]
         
         Rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
-        axs[bt].plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]))
+        axs.plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]))
     axs.plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 100], label='t_min + bolus')
     axs.plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 100], label='t_max + bolus')
     axs.plot([boluses[bt], boluses[bt]], [0, 100], label='skin surface')
