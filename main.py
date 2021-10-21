@@ -152,8 +152,8 @@ output = brute_force(t_min_input, t_max_input, field_size_input)
 st.table(output)
 
 fig, axs = plt.subplots(1, 3)
-fig.set_height(300)
-fig.set_width=(100)
+fig.set_figheight(300)
+fig.set_figwidth=(100)
 boluses = [3, 5, 10]
 for bt in range(3):
     for e in range(5):
