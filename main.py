@@ -163,15 +163,15 @@ for bt in range(3):
         
         Rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
         axs[bt].plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]))
-    axs[j].plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 100], label='t_min + bolus')
-    axs[j].plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 100], label='t_max + bolus')
-    axs[j].plot([boluses[bt], boluses[bt]], [0, 100], label='skin surface')
-    axs[j].xlim([0, data[e][-1, 0]])
-    axs[j].ylim([0, np.amax(Rx_normed) + 0.05])
+    axs[bt].plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 100], label='t_min + bolus')
+    axs[bt].plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 100], label='t_max + bolus')
+    axs[bt].plot([boluses[bt], boluses[bt]], [0, 100], label='skin surface')
+    axs[bt].xlim([0, data[e][-1, 0]])
+    axs[bt].ylim([0, np.amax(Rx_normed) + 0.05])
         
-    axs[j].title('{} mm bolus'.format(boluses[bt]))
-    axs[j].legend()
-    axs[j].xlabel('Depth', fontsize=14)
-    axs[j].ylabel('Percent Rx Dose', fontsize=14)
+    axs[bt].title('{} mm bolus'.format(boluses[bt]))
+    axs[bt].legend()
+    axs[bt].xlabel('Depth', fontsize=14)
+    axs[bt].ylabel('Percent Rx Dose', fontsize=14)
 st.pyplot(fig)
 
