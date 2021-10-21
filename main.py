@@ -151,9 +151,9 @@ output = brute_force(t_min_input, t_max_input, field_size_input)
 # st.dataframe(output, width=2000, height=1000)
 st.table(output)
 
-fig, axs = plt.subplots(3)
 boluses = [3, 5, 10]
 for bt in range(3):
+    fig, axs = plt.subplots()
     for e in range(5):
         interpolant = interp1d(data[e][:, 0], data[e][:, fs_idx])
         fine_res_depths = np.linspace(0, data[e][-1, 0], 1000)
@@ -163,16 +163,16 @@ for bt in range(3):
         
         Rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
         axs[bt].plot(data[e][:, 0], Rx_normed, label='{} PDD'.format(energy_dictionary[e]))
-    axs[bt].plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 100], label='t_min + bolus')
-    axs[bt].plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 100], label='t_max + bolus')
-    axs[bt].plot([boluses[bt], boluses[bt]], [0, 100], label='skin surface')
-    axs[bt].set_xlim([0, data[e][-1, 0]])
-    axs[bt].set_ylim([0, 150])
+    axs.plot([t_min + boluses[bt], t_min + boluses[bt]], [0, 100], label='t_min + bolus')
+    axs.plot([t_max + boluses[bt], t_max + boluses[bt]], [0, 100], label='t_max + bolus')
+    axs.plot([boluses[bt], boluses[bt]], [0, 100], label='skin surface')
+    axs.set_xlim([0, data[e][-1, 0]])
+    axs.set_ylim([0, 150])
         
-    axs[bt].set_title('{} mm bolus'.format(boluses[bt]))
-    axs[bt].legend(fontsize='xsmall', loc='upper right')
-    axs[bt].set_xlabel('Depth')
-    axs[bt].set_ylabel('Percent Rx Dose')
-fig.savefig('PDDs.png')
-st.image('PDDs.png')
+    axs.set_title('{} mm bolus'.format(boluses[bt]))
+    axs.legend(fontsize='xsmall', loc='upper right')
+    axs.set_xlabel('Depth')
+    axs.set_ylabel('Percent Rx Dose')
+    fig.savefig('{}PDD.png'.format(boluses[bt]))
+    st.image('{}PDD.png'.format(boluses[bt]))
 
