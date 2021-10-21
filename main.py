@@ -159,7 +159,7 @@ for bt in range(3):
         interpolant = interp1d(data[e][:, 0], data[e][:, fs_idx])
         fine_res_depths = np.linspace(0, data[e][-1, 0], 1000)
         fine_res_dose = interpolant(fine_res_depths)
-        t_max_idx = np.where(np.abs(fine_res_depths - (t_max + boluses[bt])) == np.amin(np.abs(fine_res_depths - (t_max + boluses[bt]))))[0][0]
+        t_max_idx = np.where(np.abs(fine_res_depths - (t_max_input + boluses[bt])) == np.amin(np.abs(fine_res_depths - (t_max_input + boluses[bt]))))[0][0]
         t_max_dose = fine_res_dose[t_max_idx]
         
         rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
