@@ -223,4 +223,4 @@ for bt in range(4):
     axs.set_ylabel('Percent Rx Dose')
     fig.savefig('{}PDD.png'.format(boluses[bt]))
     col_idx = bt % 2 + 1
-    cols[col_idx].image('{}PDD.png'.format(boluses[bt]))
+    im_cols[col_idx].image('{}PDD.png'.format(boluses[bt]))
