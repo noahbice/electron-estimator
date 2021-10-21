@@ -135,7 +135,8 @@ def brute_force(t_min, t_max, field_size, w1=1., w2=1., w3=1., w4=1.):
     possibilities['Depth Dose ({} mm)'.format(depth_dose)] = possibilities['Depth Dose ({} mm)'.format(depth_dose).format(np.round(1.5*t_max, 2))].astype('float').round(2)
 
     possibilities = possibilities.sort_values(by=['Error'], axis=0, ascending=True)
-
+    possibilities = possibilities.drop(columns=['Error'])
+    
     return possibilities
 
 # sunshine_logic(t_min, t_max, field_size)
