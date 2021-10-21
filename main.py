@@ -121,7 +121,7 @@ def brute_force(t_min, t_max, field_size, w1=1., w2=1., w3=1., w4=1.):
     possibilities = []
     depth_dose = np.round(1.5 * t_max, 2)
     for energy_index in range(5):
-        for bolus_thickness in [3, 5, 10]:
+        for bolus_thickness in [0, 3, 5, 10]:
             po = print_out(t_min, t_max, field_size, energy_index, bolus_thickness, verbose=False)
             error = (w1 * (100 - po[0]) ** 2) + (w2 * (100 - po[2]) **2) + (w3 * po[3] ** 2) + (w4 * (po[4]) ** 2)
             possibilities.append([energy_dictionary[energy_index], bolus_thickness] + po + [error] )
@@ -152,8 +152,8 @@ output = brute_force(t_min_input, t_max_input, field_size_input)
 st.table(output)
 
 colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
-boluses = [3, 5, 10]
-for bt in range(3):
+boluses = [0, 3, 5, 10]
+for bt in range(4):
     fig, axs = plt.subplots()
     for e in range(5):
         interpolant = interp1d(data[e][:, 0], data[e][:, fs_idx])
