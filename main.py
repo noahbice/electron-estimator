@@ -172,5 +172,5 @@ for bt in range(3):
         plt.legend()
         plt.xlabel('Depth', fontsize=14)
         plt.ylabel('Percent Rx Dose', fontsize=14)
-        plt.show()
+st.pyplot(fig)
 
