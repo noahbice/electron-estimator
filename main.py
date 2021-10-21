@@ -148,5 +148,6 @@ t_min_input = st.number_input('Target Min Depth [mm]', value=10.)
 t_max_input = st.number_input('Target Max Depth [mm]', value=20.)
 field_size_input = st.selectbox('Field Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'), index=3)
 output = brute_force(t_min_input, t_max_input, field_size_input)
-st.table(output, width=2000, height=1000)
+# st.dataframe(output, width=2000, height=1000)
+st.table(output)
 
