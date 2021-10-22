@@ -142,7 +142,7 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
 
             cont = False
             for value in po:
-                if value < 200:
+                if value < 150:
                     continue
                 else:
                     cont = True
