@@ -177,7 +177,7 @@ if t_max_input < t_min_input:
     st.error('Target min depth should be < target max depth.')
     quit()
 
-adv_cols = st.columns((1, 6, 1)
+adv_cols = st.columns((1, 6, 1))
 with adv_cols[1].expander("Advanced"):
     advanced_cols1 = st.columns(2)
     oar_depth_input = advanced_cols1[0].number_input('OAR Depth [mm]', value=1.5 * t_max_input, step=0.5)
