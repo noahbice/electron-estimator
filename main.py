@@ -169,9 +169,10 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
 
 st.set_page_config(layout='wide')
 st.title('Electron Energy/Bolus Estimator')
-t_min_input = st.number_input('Target Min Depth [mm]', value=10., step=0.5)
-t_max_input = st.number_input('Target Max Depth [mm]', value=20., step=0.5)
-field_size_input = st.selectbox('Field Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'), index=3)
+input_cols = st.columns(3)
+t_min_input = input_cols[0].number_input('Target Min Depth [mm]', value=10., step=0.5)
+t_max_input = input_cols[1].number_input('Target Max Depth [mm]', value=20., step=0.5)
+field_size_input = input_cols[2].selectbox('Field Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'), index=3)
 if t_max_input < t_min_input:
     st.error('Target min depth should be < target max depth.')
     quit()
