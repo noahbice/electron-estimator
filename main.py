@@ -181,7 +181,7 @@ if t_max_input < t_min_input:
 with st.expander("Advanced"):
     advanced_cols1 = st.columns(2)
     oar_depth_input = advanced_cols1[0].number_input('OAR Depth [mm]', value=1.5 * t_max_input, step=0.5)
-    oar_target_dose_input = advanced_cols[1].number_input('OAR Target Dose [%Rx Dose]', value=30., step=1.)
+    oar_target_dose_input = advanced_cols1[1].number_input('OAR Target Dose [%Rx Dose]', value=30., step=1.)
     advanced_cols2 = st.columns(4)
     w_t_input = advanced_cols2[0].number_input('Entrance Dose Coverage Priority', value=1., step=0.1)
     w_hotspot_input = advanced_cols2[1].number_input('Hotspot Reduction Priority', value=1., step=0.1)
