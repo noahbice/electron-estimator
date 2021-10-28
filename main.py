@@ -195,7 +195,8 @@ output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input
                      w_t_min=w_t_input, w_hotspot=w_hotspot_input, w_depth=w_depth_input, w_skin=w_skin_input)
 output = output.set_index(['Energy, Bolus'])
 filter_col = output[:,-1].to_numpy()
-where_stop = np.where(filtercol > 90)[0][0]
+where_stop = np.where(filtercol > 90)[0]
+print(where_stop)
 out_cols = st.columns((1, 4, 1))
 out_cols[1].dataframe(output[:where_stop], width=2000, height=1000)
 
