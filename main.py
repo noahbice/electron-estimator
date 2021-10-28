@@ -190,6 +190,7 @@ with st.expander("Advanced"):
     w_skin_input = advanced_cols2[2].number_input('Skin Dose Reduction Priority', value=1., step=0.1)
     w_depth_input = advanced_cols2[3].number_input('OAR Sparing Priority', value=1., step=0.1)
 
+print(oar_depth_input, t_min_input, t_max_input)
 
 # print(sunshine_logic(t_min_input, t_max_input, field_size_input))
 
