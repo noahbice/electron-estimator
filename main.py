@@ -194,7 +194,7 @@ output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input
                      w_t_min=w_t_input, w_hotspot=w_hotspot_input, w_depth=w_depth_input, w_skin=w_skin_input)
 output = output.set_index(['Energy, Bolus'])
 out_cols = st.columns((1, 4, 1))
-out_cols[1].dataframe(output[0:10], width=2000, height=1000)
+out_cols[1].dataframe(output, width=2000, height=1000)
 
 colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
 boluses = [0, 3, 5, 10]
