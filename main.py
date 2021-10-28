@@ -170,8 +170,8 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
 st.set_page_config(layout='wide')
 st.title('Electron Energy/Bolus Estimator')
 input_cols = st.columns((1, 2, 2, 2, 1))
-t_min_input = input_cols[1].number_input('Target Min Depth [cm]', value=10., step=0.5)
-t_max_input = input_cols[2].number_input('Target Max Depth [cm]', value=20., step=0.5)
+t_min_input = input_cols[1].number_input('Target Min Depth [cm]', value=1., step=0.5)
+t_max_input = input_cols[2].number_input('Target Max Depth [cm]', value=2., step=0.5)
 field_size_input = input_cols[3].selectbox('Field Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'), index=3)
 if t_max_input < t_min_input:
     st.error('Target min depth should be < target max depth.')
@@ -187,7 +187,10 @@ with st.expander("Advanced"):
     w_skin_input = advanced_cols2[2].number_input('Skin Dose Reduction Priority', value=1., step=0.1)
     w_depth_input = advanced_cols2[3].number_input('OAR Sparing Priority', value=1., step=0.1)
 
-
+t_min_input *= 10
+t_max_input *= 10
+oar_depth_input *= 10
+    
 output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input, oar_target_dose_input,
                      w_t_min=w_t_input, w_hotspot=w_hotspot_input, w_depth=w_depth_input, w_skin=w_skin_input)
 output = output.set_index(['Energy, Bolus'])
