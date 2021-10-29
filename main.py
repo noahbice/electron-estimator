@@ -197,7 +197,7 @@ output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input
                      w_t_min=w_t_input, w_hotspot=w_hotspot_input, w_depth=w_depth_input, w_skin=w_skin_input)
 output = output.set_index(['Energy, Bolus'])
 filter_col = output.to_numpy()[:,-1]
-where_stop = np.where(filter_col < 80)[0]
+where_stop = np.where(filter_col < 70)[0]
 filtered = output.iloc[where_stop]
 out_cols = st.columns((1, 4, 1))
 out_cols[1].dataframe(filtered, width=2000, height=1000)
@@ -222,7 +222,7 @@ for bt in range(4):
 
         rx_normed = (data[e][:, fs_idx] / t_max_dose) * 100
         print(d_oar_plot)
-        if np.amax(rx_normed) > 150 or d_oar_plot > 0.85:
+        if np.amax(rx_normed) > 150: or d_oar_plot > 0.75:
             continue
         axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
     axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
