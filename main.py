@@ -11,19 +11,24 @@ fs_dictionary = {'4x4': 1, '6x6': 2, '6x10': 3, '10x10': 4, '15x15': 5, '20x20':
 energy_dictionary = {0: '6 MeV', 1: '9 MeV', 2: '12 MeV', 3: '16 MeV', 4: '20 MeV'}
 data = np.load('pdds.npy', allow_pickle=True)
 
-R90s = np.zeros((5, 8), dtype='float32')
+Rs = np.zeros((5, 8, 5), dtype='float32')
 for i in range(5):
     for j in range(8):
         if j == 0:
-            R90s[i, j] = 0
             continue
         interpolant = interp1d(data[i][:, 0], data[i][:, j])
         fine_res_depths = np.linspace(0, data[i][-1, 0], 1000)
         fine_res_dose = interpolant(fine_res_depths)
         d_max_idx = np.where(np.abs(fine_res_dose - 100) == np.amin(np.abs(fine_res_dose - 100)))[0][0]
-        d_idx = np.where(np.abs(fine_res_dose[d_max_idx:] - 90) == np.amin(np.abs(fine_res_dose[d_max_idx:] - 90)))[0]
-        d_idx += d_max_idx
-        R90s[i, j] = fine_res_depths[d_idx]
+        ranges = [90, 85, 80, 50]
+        for r_idx in range(len(ranges) + 1):
+            if r_idx == 0:
+                Rs[i, j, r_idx] = fine_res_depths[d_max_idx]
+                continue
+            d_idx = np.where(np.abs(fine_res_dose[d_max_idx:] - ranges[r_idx - 1]) == np.amin(np.abs(fine_res_dose[d_max_idx:] - ranges[r_idx - 1])))[0]
+            d_idx += d_max_idx
+            Rs[i, j, r_idx] = fine_res_depths[d_idx]
+R90s = Rs[:, :, 0]
 
 
 def print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth=None, plot=False, verbose=True,
@@ -55,7 +60,6 @@ def print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth
         for didx in range(line_doses.shape[0]):
             norm_test = (line_doses / line_doses[didx]) * 100
             vols = norm_test > Rx_dose
-            # print(vols)
             pRx[didx] = vols.astype('float').sum() / vols.shape[0]
         prx_vol  = Rx_vol / 100
         where_vol = np.where(np.abs(pRx - prx_vol) == np.amin(np.abs(pRx - prx_vol)))[0][0]
@@ -123,7 +127,7 @@ def sunshine_logic(t_min, t_max, field_size):
     return recommended_energy, recommended_bolus
 
 
-def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min=1., w_hotspot=1., w_skin=1.,
+def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min=1., w_t_max=1., w_hotspot=1., w_skin=1.,
                 w_depth=1., norm_method='vol', norm_dose=100, norm_vol=95):
     possibilities = []
     depth_dose = np.round(oar_depth, 2)
@@ -135,6 +139,7 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
             depth_err = w_depth * (max(oar_target_dose, po[4]) - oar_target_dose)
             hotspot_error = w_hotspot * (po[2] - 100)
             t_min_error = w_t_min * np.abs(100 - po[0])
+            t_max_error = w_t_max * np.abs(100 - po[1])
 
             # print(energy_dictionary[energy_index], bolus_thickness)
             # print('skin', skin_err)
@@ -142,7 +147,7 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
             # print('t_min', t_min_error)
             # print('hot_spot', hotspot_error)
 
-            error = t_min_error + hotspot_error + skin_err + depth_err
+            error = t_min_error + hotspot_error + skin_err + depth_err + t_max_error
 
             cont = False
             for value in po[:4]:
@@ -171,15 +176,25 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
 
     return possibilities
 
-
 st.set_page_config(layout='wide')
 st.title('Electron Energy/Bolus Estimator')
-input_cols = st.columns((1, 2, 2, 2, 1))
+input_cols = st.columns((1, 4, 4, 4, 1, 3, 1))
 t_min_input = input_cols[1].number_input('Target Min Depth [cm]', value=1., step=0.05)
 t_max_input = input_cols[2].number_input('Target Max Depth [cm]', value=2., step=0.05)
 field_size_input = input_cols[3].selectbox('Cone Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'),
                                            index=3)
 fs_idx = fs_dictionary[field_size_input]
+input_norm = input_cols[5].radio('Normalization: ', ('100% dose to 95% of volume', '100% to max depth', '100% to min depth'))
+input_norm_dose = 0
+input_norm_vol = 0
+if input_norm == '100% to max depth':
+    input_norm_method = 't_max'
+elif input_norm == '100% to min depth':
+    input_norm_method = 't_min'
+elif input_norm == '100% dose to 95% of volume':
+    input_norm_method = 'vol'
+    input_norm_vol = 95
+    input_norm_dose = 100
 
 if t_max_input < t_min_input:
     st.error('Target min depth should be < target max depth.')
@@ -194,17 +209,7 @@ with st.expander("Advanced"):
     w_hotspot_input = advanced_cols2[1].number_input('Hotspot Reduction Priority', value=1., step=0.1)
     w_skin_input = advanced_cols2[2].number_input('Skin Dose Reduction Priority', value=1., step=0.1)
     w_depth_input = advanced_cols2[3].number_input('OAR Sparing Priority', value=1., step=0.1)
-    input_norm = st.radio('Normalization: ', ('100% to max depth', '100% to min depth', '100% dose to 95% of volume'))
-    input_norm_dose = 0
-    input_norm_vol = 0
-    if input_norm == '100% to max depth':
-        input_norm_method = 't_max'
-    elif input_norm == '100% to min depth':
-        input_norm_method = 't_min'
-    elif input_norm == '100% dose to 95% of volume':
-        input_norm_method = 'vol'
-        input_norm_vol = 95
-        input_norm_dose = 100
+
 t_min_input *= 10
 t_max_input *= 10
 oar_depth_input *= 10
@@ -258,3 +263,13 @@ for bt in range(6):
     fig.savefig('{}PDD.png'.format(boluses[bt]))
     col_idx = bt % 2 + 1
     im_cols[col_idx].image('{}PDD.png'.format(boluses[bt]))
+
+st.markdown('***')
+st.markdown('### Ranges for a {} cone (mm):'.format(field_size_input))
+range_cols = st.columns((1, 3, 1))
+range_display = Rs[:, fs_idx]
+range_display = pd.DataFrame(range_display,
+                             index=['6 MeV', '9 MeV', '12 MeV', '16 MeV', '20 MeV'],
+                             columns=['Rmax', 'R90', 'R85', 'R80', 'R50']
+                             ).astype('float').round(2)
+range_cols[1].table(range_display)
