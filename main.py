@@ -148,18 +148,9 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
             # print('hot_spot', hotspot_error)
 
             error = t_min_error + hotspot_error + skin_err + depth_err + t_max_error
-
-            cont = False
-            for value in po[:4]:
-                if value < 150:
-                    continue
-                else:
-                    cont = True
-                    break
-            if cont == True:
-                continue
             possibilities.append(
                 [energy_dictionary[energy_index] + ', ' + str(bolus_thickness) + ' mm'] + po + [error])
+
     possibilities = pd.DataFrame(np.array(possibilities), columns=['Energy, Bolus', 'Target Entrance Dose',
                                                                    'Target Exit Dose', 'Hot Spot', 'Skin Dose',
                                                                    'Depth Dose ({} mm)'.format(depth_dose), 'norm', 'Error'])
@@ -218,12 +209,27 @@ output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input
                      w_t_min=w_t_input, w_hotspot=w_hotspot_input, w_depth=w_depth_input, w_skin=w_skin_input,
                      norm_method=input_norm_method, norm_dose=input_norm_dose, norm_vol=input_norm_vol)
 output = output.set_index(['Energy, Bolus'])
+
 filter_col = output.to_numpy()[:, -3]
-where_stop = np.where(filter_col < 90)[0]
+where_stop = np.where(filter_col < 90)[0] # depth dose must be < 90
 filtered = output.iloc[where_stop]
+filter_col2 = filtered.to_numpy()[:, -6]
+where_stop2 = np.where(filter_col2 > 60)  # target entrance dose must be > 60
+filtered = filtered.iloc[where_stop2]
+filter_col3 = filtered.to_numpy()[:, -5]
+where_stop3 = np.where(filter_col3 < 150)  # hot spot dose must be < 150
+filtered = filtered.iloc[where_stop3]
+
 filtered = filtered.drop(columns=['norm', 'Error'])
 out_cols = st.columns((1, 4, 1))
-out_cols[1].dataframe(filtered, width=2000, height=1000)
+if filtered.empty:
+    out_cols[1].write('No acceptable plans were found. Please verify your inputs.')
+    out_cols[1].write('')
+    out_cols[1].write('Would you display possibilities?')
+    if out_cols[1].button('Proceed'):
+        out_cols[1].dataframe(output, width=2000, height=1000)
+else:
+    out_cols[1].dataframe(filtered, width=2000, height=1000)
 
 colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
 boluses = [0, 3, 5, 8, 10, 13]
