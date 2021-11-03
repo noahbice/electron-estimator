@@ -231,44 +231,44 @@ if filtered.empty:
 else:
     out_cols[1].dataframe(filtered, width=2000, height=1000)
 
-colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
-boluses = [0, 3, 5, 8, 10, 13]
-im_cols = st.columns((1, 3, 3, 1))
-for bt in range(6):
-    fig, axs = plt.subplots()
-    for e in range(5):
-        interpolant = interp1d(data[e][:, 0], data[e][:, fs_idx])
-        fine_res_depths = np.linspace(0, data[e][-1, 0], 1000)
-        fine_res_dose = interpolant(fine_res_depths)
-        t_max_idx = np.where(np.abs(fine_res_depths - (t_max_input + boluses[bt])) == np.amin(
-            np.abs(fine_res_depths - (t_max_input + boluses[bt]))))[0][0]
-        t_max_dose = fine_res_dose[t_max_idx]
-        d_oar_plot_idx = np.where(np.abs(fine_res_depths - (2. * t_max_input + boluses[bt])) == np.amin(
-            np.abs(fine_res_depths - (2. * t_max_input + boluses[bt]))))[0][0]
-        d_oar_plot = fine_res_dose[d_oar_plot_idx]
-        d_oar_plot /= t_max_dose
-        try:
-            norm_value = output['norm'].loc[energy_dictionary[e] + ', ' + str(boluses[bt]) + ' mm']
-        except:
-            continue
-        rx_normed = (data[e][:, fs_idx] / norm_value) * 100
-        if np.amax(rx_normed) > 150 or d_oar_plot > 0.85:
-            continue
-        axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
-    axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
-    axs.plot([t_max_input + boluses[bt], t_max_input + boluses[bt]], [0, 150], label='t_max + bolus', color=colors[-2])
-    if boluses[bt] != 0:
-        axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
-    axs.set_xlim([0, np.minimum(3 * t_max_input, data[e][-1, 0])])
-    axs.set_ylim([0, 150])
-
-    axs.set_title('{} mm bolus'.format(boluses[bt]))
-    axs.legend(fontsize='x-small', loc='upper right')
-    axs.set_xlabel('Depth [mm]')
-    axs.set_ylabel('Percent Rx Dose')
-    fig.savefig('{}PDD.png'.format(boluses[bt]))
-    col_idx = bt % 2 + 1
-    im_cols[col_idx].image('{}PDD.png'.format(boluses[bt]))
+    colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
+    boluses = [0, 3, 5, 8, 10, 13]
+    im_cols = st.columns((1, 3, 3, 1))
+    for bt in range(6):
+        fig, axs = plt.subplots()
+        for e in range(5):
+            interpolant = interp1d(data[e][:, 0], data[e][:, fs_idx])
+            fine_res_depths = np.linspace(0, data[e][-1, 0], 1000)
+            fine_res_dose = interpolant(fine_res_depths)
+            t_max_idx = np.where(np.abs(fine_res_depths - (t_max_input + boluses[bt])) == np.amin(
+                np.abs(fine_res_depths - (t_max_input + boluses[bt]))))[0][0]
+            t_max_dose = fine_res_dose[t_max_idx]
+            d_oar_plot_idx = np.where(np.abs(fine_res_depths - (2. * t_max_input + boluses[bt])) == np.amin(
+                np.abs(fine_res_depths - (2. * t_max_input + boluses[bt]))))[0][0]
+            d_oar_plot = fine_res_dose[d_oar_plot_idx]
+            d_oar_plot /= t_max_dose
+            try:
+                norm_value = output['norm'].loc[energy_dictionary[e] + ', ' + str(boluses[bt]) + ' mm']
+            except:
+                continue
+            rx_normed = (data[e][:, fs_idx] / norm_value) * 100
+            if np.amax(rx_normed) > 150 or d_oar_plot > 0.85:
+                continue
+            axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
+        axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus', color=colors[-1])
+        axs.plot([t_max_input + boluses[bt], t_max_input + boluses[bt]], [0, 150], label='t_max + bolus', color=colors[-2])
+        if boluses[bt] != 0:
+            axs.plot([boluses[bt], boluses[bt]], [0, 150], label='skin surface', color=colors[-3])
+        axs.set_xlim([0, np.minimum(3 * t_max_input, data[e][-1, 0])])
+        axs.set_ylim([0, 150])
+    
+        axs.set_title('{} mm bolus'.format(boluses[bt]))
+        axs.legend(fontsize='x-small', loc='upper right')
+        axs.set_xlabel('Depth [mm]')
+        axs.set_ylabel('Percent Rx Dose')
+        fig.savefig('{}PDD.png'.format(boluses[bt]))
+        col_idx = bt % 2 + 1
+        im_cols[col_idx].image('{}PDD.png'.format(boluses[bt]))
 
 st.markdown('***')
 st.markdown('### Ranges for a {} cone (mm):'.format(field_size_input))
