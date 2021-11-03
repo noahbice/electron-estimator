@@ -225,7 +225,7 @@ out_cols = st.columns((1, 4, 1))
 if filtered.empty:
     out_cols[1].write('No acceptable plans were found. Please verify your inputs.')
     out_cols[1].write('')
-    out_cols[1].write('Would you display possibilities?')
+    out_cols[1].write('Would you like to display possibilities?')
     if out_cols[1].button('Proceed'):
         out_cols[1].dataframe(output.drop(columns=['norm', 'Error']), width=2000, height=1000)
 else:
