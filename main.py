@@ -167,7 +167,7 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
 
     return possibilities
 
-st.set_page_config(layout='wide')
+st.set_page_config(layout='centered')
 st.title('Electron Energy/Bolus Estimator')
 input_cols = st.columns((1, 4, 4, 4, 1, 3, 1))
 t_min_input = input_cols[1].number_input('Target Min Depth [cm]', value=1., step=0.05)
