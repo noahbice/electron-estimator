@@ -5,8 +5,4 @@ Higher-than-necessary energies are penalized based on some input ``OAR Depth'' a
 
 The following objective function is used to sort possible combinations:
 
-w_1	|target entrance dose – 100 | 
-+ w_2	|target exit dose – 100 | 
-+ w_3 (hotspot dose – 100) 
-+ + w_4 (max(90, skin dose) – 90) 
-+ + w_5 (max(OAR target dose, true OAR dose) – OAR target dose)
+w_1	|target entrance dose – 100 | + w_2	|target exit dose – 100 | + w_3 (hotspot dose – 100) + w_4 (max(90, skin dose) – 90) + w_5 (max(OAR target dose, true OAR dose) – OAR target dose)
