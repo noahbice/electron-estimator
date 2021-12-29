@@ -233,7 +233,7 @@ filter_col3 = filtered.to_numpy()[:, -5]
 where_stop3 = np.where(filter_col3 < 150)  # hot spot dose must be < 150
 filtered = filtered.iloc[where_stop3]
 filter_col4 = filtered.to_numpy()[:, -3]
-where_stop4 = np.where(filter_col4 < 100.)[0]
+where_stop4 = np.where(filter_col4 < 99.)[0]
 filtered = filtered.iloc[where_stop4]
 
 filtered = filtered.drop(columns=['norm', 'Error'])
