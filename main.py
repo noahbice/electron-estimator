@@ -34,7 +34,7 @@ R90s = Rs[:, :, 0]
 
 def print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth=None, plot=False, verbose=True,
               Rx_vol=95, Rx_dose=100, norm_method='vol'):
-    if oar_depth is not None:
+    if oar_depth is None:
         oar_depth = 1.5 * t_max
     fs_idx = fs_dictionary[field_size]
 
@@ -101,33 +101,6 @@ def print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth
     return [t_min_dose, t_max_dose, d_max_dose, skin_dose, d_oar, norm_val]
 
 
-def sunshine_logic(t_min, t_max, field_size):
-    fs_idx = fs_dictionary[field_size]
-
-    # Select energy to match R90
-    for i in range(5):
-        # print(R90s[i, fs_idx], t_max)
-        if R90s[i, fs_idx] < t_max:
-            continue
-        else:
-            recommended_energy = energy_dictionary[i]
-            recommended_energy_index = i
-            break
-
-    # Select bolus if "overshooting"
-    recommended_bolus = 0
-    if np.abs(R90s[recommended_energy_index, fs_idx] - t_max) > 10:
-        recommended_bolus += 10
-    elif np.abs(R90s[recommended_energy_index, fs_idx] - t_max) > 5:
-        recommended_bolus += 5
-    elif np.abs(R90s[recommended_energy_index, fs_idx] - t_max) > 3:
-        recommended_bolus += 3
-
-    # print_out(t_min, t_max, field_size, recommended_energy_index, recommended_bolus, plot=False)
-
-    return recommended_energy, recommended_bolus
-
-
 def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min=1., w_t_max=1., w_hotspot=1.,
                 w_skin=1.,
                 w_depth=1., norm_method='vol', norm_dose=100, norm_vol=95):
@@ -135,7 +108,7 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
     depth_dose = np.round(oar_depth, 2)
     for energy_index in range(5):
         for bolus_thickness in [0, 3, 5, 8, 10, 13]:
-            po = print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth_input, verbose=False,
+            po = print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth, verbose=False,
                            norm_method=norm_method, Rx_dose=norm_dose, Rx_vol=norm_vol)
             skin_err = w_skin * (max(90, po[3]) - 90)
             depth_err = w_depth * (max(oar_target_dose, po[4]) - oar_target_dose)
@@ -174,8 +147,8 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
 st.set_page_config(layout='wide')
 st.title('Electron Energy/Bolus Estimator')
 input_cols = st.columns((1, 4, 4, 4, 1, 3, 1))
-t_min_input = input_cols[1].number_input('Target Min Depth [cm]', value=1., step=0.05)
-t_max_input = input_cols[2].number_input('Target Max Depth [cm]', value=2., step=0.05)
+t_min_input = input_cols[1].number_input('Target Min Depth [mm]', value=10., step=0.5)
+t_max_input = input_cols[2].number_input('Target Max Depth [mm]', value=20., step=0.5)
 field_size_input = input_cols[3].selectbox('Cone Size: ', ('4x4', '6x6', '6x10', '10x10', '15x15', '20x20', '25x25'),
                                            index=3)
 fs_idx = fs_dictionary[field_size_input]
@@ -198,7 +171,7 @@ if t_max_input < t_min_input:
 
 skin_default_weight = 0.
 dose_default_percent = 90.
-if t_min_input > 0.5:
+if t_min_input > 5:
     skin_default_weight = 1.
     dose_default_percent = 30.
 
@@ -206,7 +179,7 @@ if t_min_input > 0.5:
 
 with st.expander("Advanced"):
     advanced_cols1 = st.columns(2)
-    oar_depth_input = advanced_cols1[0].number_input('OAR Depth [cm]', value=1.5 * t_max_input, step=0.05)
+    oar_depth_input = advanced_cols1[0].number_input('OAR Depth [mm]', value=1.5 * t_max_input, step=0.5)
     oar_target_dose_input = advanced_cols1[1].number_input('OAR Target Dose [%Rx Dose]', value=dose_default_percent, step=1.)
     advanced_cols2 = st.columns(4)
     w_t_input = advanced_cols2[0].number_input('Entrance Dose Coverage Priority', value=1., step=0.1)
@@ -214,17 +187,13 @@ with st.expander("Advanced"):
     w_skin_input = advanced_cols2[2].number_input('Skin Dose Reduction Priority', value=skin_default_weight, step=0.1)
     w_depth_input = advanced_cols2[3].number_input('OAR Sparing Priority', value=1., step=0.1)
 
-t_min_input *= 10
-t_max_input *= 10
-oar_depth_input *= 10
-
 output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input, oar_target_dose_input,
                      w_t_min=w_t_input, w_hotspot=w_hotspot_input, w_depth=w_depth_input, w_skin=w_skin_input,
                      norm_method=input_norm_method, norm_dose=input_norm_dose, norm_vol=input_norm_vol)
 output = output.set_index(['Energy, Bolus'])
 
 filter_col = output.to_numpy()[:, -3]
-where_stop = np.where(filter_col < oar_target_dose_input * 2)[0]  # depth dose must be < 90
+where_stop = np.where(filter_col < oar_target_dose_input * 2)[0]  # depth dose must be < 2x oar target dose
 filtered = output.iloc[where_stop]
 filter_col2 = filtered.to_numpy()[:, -6]
 where_stop2 = np.where(filter_col2 > 60)  # target entrance dose must be > 60
@@ -232,8 +201,8 @@ filtered = filtered.iloc[where_stop2]
 filter_col3 = filtered.to_numpy()[:, -5]
 where_stop3 = np.where(filter_col3 < 150)  # hot spot dose must be < 150
 filtered = filtered.iloc[where_stop3]
-filter_col4 = filtered.to_numpy()[:, -3]
-where_stop4 = np.where(filter_col4 < 99.)[0]
+filter_col4 = filtered.to_numpy()[:, -3]  # oar dose must be < 98%
+where_stop4 = np.where(filter_col4 < 98.)[0]
 filtered = filtered.iloc[where_stop4]
 
 filtered = filtered.drop(columns=['norm', 'Error'])
