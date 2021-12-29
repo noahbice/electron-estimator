@@ -211,7 +211,7 @@ output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input
 output = output.set_index(['Energy, Bolus'])
 
 filter_col = output.to_numpy()[:, -3]
-where_stop = np.where(filter_col < 90)[0] # depth dose must be < 90
+where_stop = np.where(filter_col < oar_target_dose_input*2)[0] # depth dose must be < 90
 filtered = output.iloc[where_stop]
 filter_col2 = filtered.to_numpy()[:, -6]
 where_stop2 = np.where(filter_col2 > 60)  # target entrance dose must be > 60
@@ -219,6 +219,10 @@ filtered = filtered.iloc[where_stop2]
 filter_col3 = filtered.to_numpy()[:, -5]
 where_stop3 = np.where(filter_col3 < 150)  # hot spot dose must be < 150
 filtered = filtered.iloc[where_stop3]
+filter_col4 = output.to_numpy()[:, -3]
+where_stop4 = np.where(filter_col < 100.)[0]
+filtered = filtered.iloc[where_stop4]
+
 
 filtered = filtered.drop(columns=['norm', 'Error'])
 out_cols = st.columns((1, 4, 1))
