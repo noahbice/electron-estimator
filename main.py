@@ -95,7 +95,7 @@ def print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth
     if verbose:
         print('Energy: ', energy_dictionary[energy_index], ', Bolus: {} mm'.format(bolus_thickness), \
               ', t_min Dose: {}%'.format(np.round(t_min_dose, 2)), ', t_max Dose: {}%'.format(np.round(t_max_dose, 2)), \
-              ', Hot Spot Dose: {}%'.format(np.round(d_max_dose, 2)), ', Skin Dose: {}%'.format(np.round(skin_dose, 2)), \
+              ', Hot Spot Dose: {}%'.format(np.round(d_max_dose, 2)), ', Surface Dose: {}%'.format(np.round(skin_dose, 2)), \
               ', D(OAR): {}%'.format(np.round(d_oar, 2)))
 
     return [t_min_dose, t_max_dose, d_max_dose, skin_dose, d_oar, norm_val]
@@ -111,8 +111,8 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
             po = print_out(t_min, t_max, field_size, energy_index, bolus_thickness, oar_depth, verbose=False,
                            norm_method=norm_method, Rx_dose=norm_dose, Rx_vol=norm_vol)
             skin_err = w_skin * (max(90, po[3]) - 90)
-            depth_err = w_depth * (max(oar_target_dose, po[4]) - oar_target_dose)
-            hotspot_error = w_hotspot * (po[2] - 100)
+            depth_err = w_depth * (max(oar_target_dose, po[4]) - oar_target_dose) * oar_target_dose * 0.04
+            hotspot_error = w_hotspot * (max(110, po[2]) - 110)
             t_min_error = w_t_min * np.abs(100 - po[0])
             t_max_error = w_t_max * np.abs(100 - po[1])
 
@@ -127,17 +127,17 @@ def brute_force(t_min, t_max, field_size, oar_depth, oar_target_dose=50, w_t_min
                 [energy_dictionary[energy_index] + ', ' + str(bolus_thickness) + ' mm'] + po + [error])
 
     possibilities = pd.DataFrame(np.array(possibilities), columns=['Energy, Bolus', 'Target Entrance Dose',
-                                                                   'Target Exit Dose', 'Hot Spot', 'Skin Dose',
-                                                                   'Depth Dose ({} mm)'.format(depth_dose), 'norm',
+                                                                   'Target Exit Dose', 'Hot Spot', 'Surface Dose',
+                                                                   'OAR Depth Dose ({} mm)'.format(depth_dose), 'norm',
                                                                    'Error'])
-    possibilities['Skin Dose'] = possibilities['Skin Dose'].astype('float').round(2)
+    possibilities['Surface Dose'] = possibilities['Surface Dose'].astype('float').round(2)
     possibilities['Target Exit Dose'] = possibilities['Target Exit Dose'].astype('float').round(2)
     possibilities['Target Entrance Dose'] = possibilities['Target Entrance Dose'].astype('float').round(2)
     possibilities['Hot Spot'] = possibilities['Hot Spot'].astype('float').round(2)
     possibilities['Error'] = possibilities['Error'].astype('float')
     possibilities['norm'] = possibilities['norm'].astype('float')
-    possibilities['Depth Dose ({} mm)'.format(depth_dose)] = possibilities[
-        'Depth Dose ({} mm)'.format(depth_dose)].astype('float').round(2)
+    possibilities['OAR Depth Dose ({} mm)'.format(depth_dose)] = possibilities[
+        'OAR Depth Dose ({} mm)'.format(depth_dose)].astype('float').round(2)
 
     possibilities = possibilities.sort_values(by=['Error'], axis=0, ascending=True)
 
@@ -170,7 +170,7 @@ if t_max_input < t_min_input:
     quit()
 
 skin_default_weight = 0.
-dose_default_percent = 90.
+dose_default_percent = 80.
 if t_min_input > 5:
     skin_default_weight = 1.
     dose_default_percent = 30.
@@ -184,7 +184,7 @@ with st.expander("Advanced"):
     advanced_cols2 = st.columns(4)
     w_t_input = advanced_cols2[0].number_input('Entrance Dose Coverage Priority', value=1., step=0.1)
     w_hotspot_input = advanced_cols2[1].number_input('Hotspot Reduction Priority', value=1., step=0.1)
-    w_skin_input = advanced_cols2[2].number_input('Skin Dose Reduction Priority', value=skin_default_weight, step=0.1)
+    w_skin_input = advanced_cols2[2].number_input('Surface Dose Reduction Priority', value=skin_default_weight, step=0.1)
     w_depth_input = advanced_cols2[3].number_input('OAR Sparing Priority', value=1., step=0.1)
 
 output = brute_force(t_min_input, t_max_input, field_size_input, oar_depth_input, oar_target_dose_input,
