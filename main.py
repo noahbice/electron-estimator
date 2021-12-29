@@ -252,6 +252,7 @@ else:
     im_cols = st.columns((1, 3, 3, 1))
     for bt in range(6):
         fig, axs = plt.subplots()
+        count_plotted = 0
         for e in range(5):
             interpolant = interp1d(data[e][:, 0], data[e][:, fs_idx])
             fine_res_depths = np.linspace(0, data[e][-1, 0], 1000)
@@ -271,6 +272,9 @@ else:
             if np.amax(rx_normed) > 150 or d_oar_plot > 0.85:
                 continue
             axs.plot(data[e][:, 0], rx_normed, label='{} PDD'.format(energy_dictionary[e]), color=colors[e])
+            count_plotted += 1
+        if count_plotted == 0:
+            continue
         axs.plot([t_min_input + boluses[bt], t_min_input + boluses[bt]], [0, 150], label='t_min + bolus',
                  color=colors[-1])
         axs.plot([t_max_input + boluses[bt], t_max_input + boluses[bt]], [0, 150], label='t_max + bolus',
