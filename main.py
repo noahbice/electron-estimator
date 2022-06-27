@@ -212,9 +212,9 @@ if filtered.empty:
     out_cols[1].write('')
     out_cols[1].write('Would you like to display possibilities?')
     if out_cols[1].button('Proceed'):
-        out_cols[1].dataframe(output.drop(columns=['norm', 'Error']), width=2000, height=1000)
+        out_cols[1].table(output.drop(columns=['norm', 'Error']), width=2000, height=1000)
 else:
-    out_cols[1].dataframe(filtered, width=2000, height=1000)
+    out_cols[1].table(filtered, width=2000, height=1000)
 
     colors = ['royalblue', 'darkgoldenrod', 'green', 'darkred', 'coral', 'orchid', 'lightgreen', 'navy']
     boluses = [0, 3, 5, 8, 10, 13]
